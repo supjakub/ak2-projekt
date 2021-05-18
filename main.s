@@ -1,3 +1,14 @@
+section .data
+    msg db "Podaj liczbe:", 0xa
+    msg_len equ $ - msg
+    msg_prime db "Liczba jest pierwsza", 0xa
+    msg_prime_len equ $ - msg_prime
+    msg_not_prime db "Liczba nie jest pierwsza", 0xa
+    msg_not_prime_len equ $ - msg_not_prime
+
+section .bss
+    ascii: rest 1
+
 section .text
 global _start
 
@@ -73,12 +84,3 @@ naive:
      not_prime:
      mov rax, 0
      ret
-     
-section .data
-    msg db "Podaj liczbe:", 0xa
-    msg_len equ $ - msg
-    msg_prime db "Liczba jest pierwsza", 0xa
-    msg_prime_len equ $ - msg_prime
-    msg_not_prime db "Liczba nie jest pierwsza", 0xa
-    msg_not_prime_len equ $ - msg_not_prime
-    ascii times 10 db 0
