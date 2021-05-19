@@ -66,21 +66,24 @@ string_to_int:
     ret
 
 naive:
-     mov rbx, rax
-     mov rcx, 2
-     loop:
-     mov rax, rbx
-     xor rdx, rdx
-     div rcx
-     cmp rdx, 0
-     je not_prime
-     inc rcx
-     cmp rbx, rcx
-     je prime
-     jmp loop
-     prime:
-     mov rax, 1
-     ret
-     not_prime:
-     mov rax, 0
-     ret
+    mov rbx, rax
+    mov rcx, 2
+    xor rdx, rdx
+    div rcx
+    mov r8, rax
+    loop:
+    mov rax, rbx
+    xor rdx, rdx
+    div rcx
+    cmp rdx, 0
+    je not_prime
+    inc rcx
+    cmp rcx, r8
+    jg prime
+    jmp loop
+    prime:
+    mov rax, 1
+    ret
+    not_prime:
+    mov rax, 0
+    ret
