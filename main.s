@@ -1,10 +1,7 @@
 section .data
-    msg db "Podaj liczbe:", 0xa
-    msg_len equ $ - msg
+    msg_input db "Podaj liczbe:", 0xa
     msg_prime db "Liczba jest pierwsza", 0xa
-    msg_prime_len equ $ - msg_prime
     msg_not_prime db "Liczba nie jest pierwsza", 0xa
-    msg_not_prime_len equ $ - msg_not_prime
 
 section .bss
     ascii: rest 2
@@ -16,8 +13,8 @@ global _start
 _start:
     mov rax, 1
     mov rdi, 1
-    mov rsi, msg
-    mov rdx, msg_len
+    mov rsi, msg_input
+    mov rdx, 14
     syscall
 
     mov rax, 0
@@ -36,14 +33,14 @@ _start:
     mov rax, 1
     mov rdi, 1
     mov rsi, msg_not_prime
-    mov rdx, msg_not_prime_len
+    mov rdx, 24
     syscall
     jmp exit
     print_prime:
     mov rax, 1
     mov rdi, 1
     mov rsi, msg_prime
-    mov rdx, msg_prime_len
+    mov rdx, 21
     syscall
     
     exit:
@@ -87,62 +84,4 @@ naive:
     ret
     not_prime:
     mov rax, 0
-    ret
-
-rand:
-    mov rax, r8
-    mov r10, 1103515245
-    mul r10
-    add rax, 12345
-    mov r8, rax
-    mov r10, 65536
-    xor rdx, rdx
-    div r10
-    xor rdx, rdx
-    mov r10, 2048
-    div r10
-    mov r9, rdx
-    mov r10, 1103515245
-    mov rax, r8
-    mul r10
-    add rax, 12345
-    mov r8, rax
-    sal r9, 10
-    mov r10, 65536
-    xor rdx, rdx
-    div r10
-    xor rdx, rdx
-    mov r10, 1024
-    div r10
-    xor r9, rdx
-    mov r10, 1103515245
-    mov rax, r8
-    mul r10
-    add rax, 12345
-    mov r8, rax
-    sal r9, 10
-    mov r10, 65536
-    xor rdx, rdx
-    div r10
-    xor rdx, rdx
-    mov r10, 1024
-    div r10
-    xor r9, rdx
-    xor rdx, rdx
-    ret
-
-fermat:
-    mov r11, rax
-    mov rax, 201
-    mov rdi, time
-    syscall
-    mov r8, [time]
-    xor cl, cl
-    f_loop:
-    call rand
-    mov rax, r9
-    div r11
-    inc cl
-    cmp cl, 5
-    jl f_loop
     ret
