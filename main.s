@@ -5,7 +5,6 @@ section .data
 
 section .bss
     ascii: rest 2
-    time: resq 1
 
 section .text
 global _start
@@ -26,7 +25,7 @@ _start:
     lea rsi, [ascii]
     mov rcx, 2
     call string_to_int
-    call naive
+    call fermat
 
     cmp rax, 1
     je print_prime
@@ -84,4 +83,38 @@ naive:
     ret
     not_prime:
     mov rax, 0
+    ret
+
+random:
+    push rax
+    mov rax, r9
+    xor rdx, rdx
+    mov r10, 2862933555777941757
+    mul r10
+    mov r10, 3037000493
+    add rax, r10
+    jnc no_carry
+    inc rdx
+    no_carry:
+    mov r10, 0xffffffffffffffff
+    div r10
+    mov rax, rdx
+    xor rdx, rdx
+    mov r10, r8
+    sub r10, 2
+    div r10
+    add rdx, 2
+    mov r9, rdx
+    pop rax
+    ret
+
+fermat:
+    mov r8, rax
+    mov rax, 0xc9
+    xor rdi, rdi
+    syscall
+    mov r9, rax
+    next_rand_f:
+    call random
+    jmp next_rand_f
     ret
