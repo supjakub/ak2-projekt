@@ -85,8 +85,7 @@ naive:
     mov rax, 0
     ret
 
-random:
-    push rax
+random: ;w r9 wylosowana liczba
     mov rax, r9
     xor rdx, rdx
     mov r10, 2862933555777941757
@@ -105,7 +104,27 @@ random:
     div r10
     add rdx, 2
     mov r9, rdx
-    pop rax
+    ret
+
+;a-r9, b-r10, n-r11, wynik-rax
+mod_power:
+    mov rax, r9
+    xor rdx, rdx
+    div r11
+    mov r9, rdx
+    xor rdx, rdx
+    mov rax, 1
+    push rcx
+    mov rcx, 1
+    loop_md:
+    mul r9
+    div r11
+    mov rax, rdx
+    xor rdx, rdx
+    inc rcx
+    cmp rcx, r10
+    jng loop_md
+    pop rcx
     ret
 
 fermat:
@@ -114,7 +133,21 @@ fermat:
     xor rdi, rdi
     syscall
     mov r9, rax
+
+    mov rcx, 0
     next_rand_f:
     call random
-    jmp next_rand_f
+    mov r10, r8
+    dec r10
+    mov r11, r8
+    call mod_power
+    cmp rax, 1
+    jne no_prime_f
+    inc rcx
+    cmp rcx, 10
+    jng next_rand_f
+    mov rax, 1
+    ret
+    no_prime_f:
+    mov rax, 0
     ret
