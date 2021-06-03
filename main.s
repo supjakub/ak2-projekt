@@ -106,25 +106,49 @@ random: ;w r9 wylosowana liczba
     mov r9, rdx
     ret
 
-;a-r9, b-r10, n-r11, wynik-rax
+;a-r9, b-r10, n-r11, wynik-rax, m-r12b, flag-r13, x-rbx
 mod_power:
+    mov r12b, 64
+    mov r13, 0x8000000000000000
+    loop_mp:
+    push r13
+    and r13, r10
+    cmp r13, 0
+    jne is_set
+    pop r13
+    shr r13, 1
+    dec r12b
+    jmp loop_mp
+    is_set:
+    pop r13
+
     mov rax, r9
-    xor rdx, rdx
     div r11
     mov r9, rdx
-    xor rdx, rdx
-    mov rax, 1
-    push rcx
-    mov rcx, 1
-    loop_md:
-    mul r9
+    mov r14, 1
+    mov rbx, r9
+    mov r13, 1
+    mov cl, 0
+    next_bit:
+    push r13
+    and r13, r10
+    cmp r13, 0
+    je is_zero
+    mov rax, r14
+    mul rbx
     div r11
-    mov rax, rdx
-    xor rdx, rdx
-    inc rcx
-    cmp rcx, r10
-    jng loop_md
-    pop rcx
+    mov r14, rdx
+    is_zero:
+    mov rax, rbx
+    mul rbx
+    div r11
+    mov rbx, rdx
+    pop r13
+    shl r13, 1
+    inc cl
+    cmp cl, r12b
+    jng next_bit
+    mov rax, r14
     ret
 
 fermat:
@@ -144,7 +168,7 @@ fermat:
     cmp rax, 1
     jne no_prime_f
     inc rcx
-    cmp rcx, 10
+    cmp rcx, 5
     jng next_rand_f
     mov rax, 1
     ret
