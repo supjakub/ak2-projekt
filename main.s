@@ -4,7 +4,7 @@ section .data
     msg_not_prime db "Liczba nie jest pierwsza", 0xa
 
 section .bss
-    ascii: rest 2
+    ascii: resb 21
 
 section .text
 global _start
@@ -19,7 +19,7 @@ _start:
     mov rax, 0
     mov rdi, 1
     mov rsi, ascii
-    mov rdx, 20
+    mov rdx, 21
     syscall
 
     lea rsi, [ascii]
@@ -50,10 +50,10 @@ _start:
 string_to_int:
     xor rbx, rbx
     next_digit:
+    cmp byte [rsi], 10
+    je end_loop
     movzx rax, byte [rsi]
     inc rsi
-    cmp al, 10
-    je end_loop
     sub al,'0'
     imul rbx, 10
     add rbx, rax
