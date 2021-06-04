@@ -128,6 +128,7 @@ mod_power:
     mov r14, 1
     mov rbx, r9
     mov r13, 1
+    push rcx
     mov cl, 0
     next_bit:
     push r13
@@ -149,6 +150,7 @@ mod_power:
     cmp cl, r12b
     jng next_bit
     mov rax, r14
+    pop rcx
     ret
 
 fermat:
