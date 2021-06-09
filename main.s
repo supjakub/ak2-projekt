@@ -96,6 +96,12 @@ string_to_int:
     ret
 
 naive:
+    cmp rax, 0
+    je not_prime
+    cmp rax, 1
+    je not_prime
+    cmp rax, 2
+    je prime
     mov rbx, rax
     mov rcx, 2
     xor rdx, rdx
@@ -187,6 +193,15 @@ mod_power:
     jmp no_set
 
 fermat:
+    cmp rax, 0
+    je no_prime_f
+    cmp rax, 1
+    je no_prime_f
+    cmp rax, 2
+    jne no_two
+    mov rax, 1
+    ret
+    no_two:
     mov r8, rax
     mov rax, 0xc9
     xor rdi, rdi
@@ -220,6 +235,10 @@ fermat:
     ret
 
 miller_rabin:
+    cmp rax, 0
+    je no_prime_mr
+    cmp rax, 1
+    je no_prime_mr
     mov r8, rax
     cmp r8, 2
     je prime_mr
