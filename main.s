@@ -97,61 +97,55 @@ random: ;w r9 wylosowana liczba
     no_carry:
     mov r10, 0xffffffffffffffff
     div r10
-    mov rax, rdx
-    xor rdx, rdx
-    mov r10, r8
-    sub r10, 2
-    div r10
-    add rdx, 2
     mov r9, rdx
     ret
 
-;a-r9, b-r10, n-r11, m-r12b
+;a-r10, b-r11, n-r12, m-r13b
 mod_power:
     ;Liczenie m
-    mov r12b, 64
+    mov r13b, 64
     mov rax, 1
     shl rax, 63
     check_if_set:
     push rax
-    and rax, r10
+    and rax, r11
     cmp rax, 0
     jne counted_m
     pop rax
     shr rax, 1
-    dec r12b
+    dec r13b
     jmp check_if_set
 
     counted_m:
     pop rax
-    mov rax, r9
+    mov rax, r10
     mov rdx, 0
-    div r11
-    mov r9, rdx
-    mov r13, 1 ;result
-    mov r14, r9 ;x
+    div r12
+    mov r10, rdx
+    mov r14, 1 ;result
+    mov r15, r10 ;x
 
     mov rbx, 1 ;maska
     next_bit:
     push rbx
-    and rbx, r10
+    and rbx, r11
     cmp rbx, 0
     je do_shift
     pop rbx
     shl rbx, 1
-    mov rax, r13
-    mul r14
-    div r11
-    mov r13, rdx
-    no_set:
     mov rax, r14
-    mul r14
-    div r11
+    mul r15
+    div r12
     mov r14, rdx
-    dec r12b
-    cmp r12b, 0
+    no_set:
+    mov rax, r15
+    mul r15
+    div r12
+    mov r15, rdx
+    dec r13b
+    cmp r13b, 0
     jne next_bit
-    mov rax, r13
+    mov rax, r14
     ret
 
     do_shift:
@@ -169,9 +163,17 @@ fermat:
     mov rcx, 0
     next_rand_f:
     call random
+
+    xor rdx, rdx
     mov r10, r8
-    dec r10
+    sub r10, 2
+    div r10
+    add rdx, 2
+    mov r10, rdx
+
     mov r11, r8
+    dec r11
+    mov r12, r8
     call mod_power
     cmp rax, 1
     jne no_prime_f
