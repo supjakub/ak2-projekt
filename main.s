@@ -106,52 +106,58 @@ random: ;w r9 wylosowana liczba
     mov r9, rdx
     ret
 
-;a-r9, b-r10, n-r11, wynik-rax, m-r12b, flag-r13, x-rbx
+;a-r9, b-r10, n-r11, m-r12b
 mod_power:
+    ;Liczenie m
     mov r12b, 64
-    mov r13, 0x8000000000000000
-    loop_mp:
-    push r13
-    and r13, r10
-    cmp r13, 0
-    jne is_set
-    pop r13
-    shr r13, 1
+    mov rax, 1
+    shl rax, 63
+    check_if_set:
+    push rax
+    and rax, r10
+    cmp rax, 0
+    jne counted_m
+    pop rax
+    shr rax, 1
     dec r12b
-    jmp loop_mp
-    is_set:
-    pop r13
+    jmp check_if_set
 
+    counted_m:
+    pop rax
     mov rax, r9
+    mov rdx, 0
     div r11
     mov r9, rdx
-    mov r14, 1
-    mov rbx, r9
-    mov r13, 1
-    push rcx
-    mov cl, 0
+    mov r13, 1 ;result
+    mov r14, r9 ;x
+
+    mov rbx, 1 ;maska
     next_bit:
-    push r13
-    and r13, r10
-    cmp r13, 0
-    je is_zero
+    push rbx
+    and rbx, r10
+    cmp rbx, 0
+    je do_shift
+    pop rbx
+    shl rbx, 1
+    mov rax, r13
+    mul r14
+    div r11
+    mov r13, rdx
+    no_set:
     mov rax, r14
-    mul rbx
+    mul r14
     div r11
     mov r14, rdx
-    is_zero:
-    mov rax, rbx
-    mul rbx
-    div r11
-    mov rbx, rdx
-    pop r13
-    shl r13, 1
-    inc cl
-    cmp cl, r12b
-    jng next_bit
-    mov rax, r14
-    pop rcx
+    dec r12b
+    cmp r12b, 0
+    jne next_bit
+    mov rax, r13
     ret
+
+    do_shift:
+    pop rbx
+    shl rbx, 1
+    jmp no_set
 
 fermat:
     mov r8, rax
