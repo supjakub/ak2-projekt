@@ -25,7 +25,7 @@ _start:
     lea rsi, [ascii]
     mov rcx, 2
     call string_to_int
-    call fermat
+    call miller_rabin
 
     cmp rax, 1
     je print_prime
@@ -175,5 +175,82 @@ fermat:
     mov rax, 1
     ret
     no_prime_f:
+    mov rax, 0
+    ret
+
+miller_rabin:
+    mov r8, rax
+    cmp r8, 2
+    je prime_mr
+    xor rdx, rdx
+    mov rbx, 2
+    div rbx
+    cmp rdx, 0
+    je no_prime_mr
+
+    mov rax, 0xc9
+    xor rdi, rdi
+    syscall
+    mov r9, rax
+
+    mov r10, 1
+    shl r10, 63
+    next_shift:
+    mov rax, r8
+    dec rax
+    xor rdx, rdx
+    div r10
+    cmp rdx, 0
+    je found_s
+    shr r10, 1
+    jmp next_shift
+
+    found_s:
+    mov rax, r8
+    xor rdx, rdx
+    div r10
+    mov r15, r10 ;2^s
+    shr r15, 1 ;2^s-1
+    mov r10, rax
+    mov r11, r8
+    mov r14, r8
+    dec r14 ;n-1
+
+    mov cl, 0
+    next_rand_mr:
+    inc cl
+    cmp cl, 2
+    jg prime_mr
+    push r10
+    call random
+    pop r10
+    push r9
+    call mod_power
+    pop r9
+    cmp rax, 1
+    je next_rand_mr
+
+    mov ebx, 1
+    next_r:
+    push r9
+    push rbx
+    call mod_power
+    pop rbx
+    pop r9
+    cmp rax, r14
+    jne next_rand_mr
+    shl rbx, 1
+    cmp rbx, r15
+    jg no_prime_mr
+    mov rax, r9
+    mul rbx
+    mov r9, rax
+    jmp next_r
+
+    prime_mr:
+    mov rax, 1
+    ret
+
+    no_prime_mr:
     mov rax, 0
     ret
