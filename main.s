@@ -1,10 +1,12 @@
 section .data
     msg_input db "Podaj liczbe:", 0xa
+    msg_choice db "Wybierz opcje: 1-algorytm naiwny, 2-algorytm Fermata, 3-algorytm Millera-Rabina", 0xa
     msg_prime db "Liczba jest pierwsza", 0xa
     msg_not_prime db "Liczba nie jest pierwsza", 0xa
 
 section .bss
     ascii: resb 21
+    choice: resb 1
 
 section .text
 global _start
@@ -25,8 +27,39 @@ _start:
     lea rsi, [ascii]
     mov rcx, 2
     call string_to_int
-    call miller_rabin
+    push rax
 
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, msg_choice
+    mov rdx, 80
+    syscall
+
+    mov rax, 0
+    mov rdi, 1
+    mov rsi, choice
+    mov rdx, 1
+    syscall
+    pop rax
+
+    cmp byte [choice], 49
+    je choose_naive
+    cmp byte [choice], 50
+    je choose_fermat
+    cmp byte [choice], 51
+    je choose_miller_rabin
+
+    choose_naive:
+    call naive
+    jmp end
+    choose_fermat:
+    call fermat
+    jmp end
+    choose_miller_rabin:
+    call miller_rabin
+    jmp end
+
+    end:
     cmp rax, 1
     je print_prime
     mov rax, 1
